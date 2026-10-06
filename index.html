@@ -3,317 +3,803 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>マイ創作ノート</title>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuODnuOCpOaJm-S9nOpatchesiIiwKICAic2hvcnRfbmFtZSI6ICLnmLPlipPjg4bjg4kiLAogICJzdGFydF91cmwiOiAiaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y3ZjlmanIiLAogICJ0aGVtZV9jb2xvciI6ICIjMmU3ZDMyIgp9">
+  <title>執筆＆物語構築スタジオ</title>
   <style>
+    /* ==========================================
+       1. 基本スタイル＆テーマ（ベージュ・ブラウン系）
+       ========================================== */
     :root {
-      --bg-color: #f7f9f7;
-      --card-bg: #ffffff;
-      --primary: #2e7d32;
-      --primary-light: #e8f5e9;
-      --text: #2c3e50;
-      --text-sub: #666666;
-      --shadow: 0 4px 15px rgba(46, 125, 50, 0.08);
-      --border-radius: 16px;
+      --bg-main: #f4efe6;          /* 全体背景：温かみのある生成り・ベージュ */
+      --bg-paper: #fbf8f3;         /* 原稿用紙・本のページ色 */
+      --bg-sidebar: #e8dfd1;       /* サイドバー背景 */
+      --accent-brown: #5c4033;     /* ダークブラウン（文字・アイコン） */
+      --accent-warm: #8b5a2b;      /* ライトブラウン（アクセント） */
+      --border-color: #dcd3c5;     /* 境界線 */
+      --text-color: #2c221e;       /* 本文テキスト */
+      --sticky-yellow: #fef3bd;    /* アイディアメモ用付箋色 */
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text); padding-bottom: 40px; min-height: 100vh; }
-    
-    header {
-      background: #fff;
-      padding: 16px 20px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", serif;
+      background-color: var(--bg-main);
+      color: var(--text-color);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ==========================================
+       2. 左スワイプ対応 サイドバー（ドロワーナビ）
+       ========================================== */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px; /* 初期状態は画面外 */
+      width: 280px;
+      height: 100%;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+
+    #sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      background-color: var(--accent-brown);
+      color: var(--bg-paper);
+      font-size: 1.1rem;
+      font-weight: bold;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
-    .logo { font-size: 1.2rem; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-    
-    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
-    .page { display: none; }
-    .page.active { display: block; }
 
-    .hero-title { text-align: center; margin: 20px 0 30px; }
-    .hero-title h1 { font-size: 1.4rem; color: var(--primary); font-weight: 600; letter-spacing: 2px; }
-    .hero-title p { font-size: 0.85rem; color: var(--text-sub); margin-top: 6px; }
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+    }
 
-    .menu-list { display: flex; flex-direction: column; gap: 16px; }
-    .menu-card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 20px;
+    .nav-item {
+      padding: 14px 24px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-color);
+      transition: background 0.2s;
       display: flex;
       align-items: center;
-      gap: 16px;
-      box-shadow: var(--shadow);
+      gap: 10px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--border-color);
+      color: var(--accent-brown);
+      font-weight: bold;
+    }
+
+    /* オーバーレイ (メニューオープン時に背景を暗くする) */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.3);
+      z-index: 999;
+      display: none;
+    }
+    #overlay.active {
+      display: block;
+    }
+
+    /* ==========================================
+       3. メインコンテンツエリア＆ヘッダー
+       ========================================== */
+    #main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    header {
+      height: 60px;
+      background-color: var(--bg-paper);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--accent-brown);
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid rgba(46, 125, 50, 0.1);
-    }
-    .menu-card:active { transform: scale(0.98); }
-    .icon-box {
-      width: 48px; height: 48px; border-radius: 12px;
-      background: var(--primary-light); color: var(--primary);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; flex-shrink: 0;
-    }
-    .menu-info { flex-grow: 1; }
-    .menu-info h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 4px; }
-    .menu-info p { font-size: 0.8rem; color: var(--text-sub); }
-
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: none; border: none; color: var(--primary);
-      font-size: 0.95rem; font-weight: bold; cursor: pointer; padding: 8px 0; margin-bottom: 16px;
+      padding: 5px;
     }
 
-    input, textarea, select {
-      width: 100%; padding: 12px 16px; border: 1px solid #ddd;
-      border-radius: 8px; font-size: 1rem; margin-top: 8px; margin-bottom: 16px;
-      outline: none; background: #fff;
+    .header-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent-brown);
     }
-    input:focus, textarea:focus { border-color: var(--primary); }
-    
+
+    .view-section {
+      display: none;
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .view-section.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 共通: 作品選択ドロップダウン */
+    .book-selector-bar {
+      background: var(--bg-sidebar);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    select, input, textarea, button {
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    select {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-paper);
+      color: var(--text-color);
+    }
+
+    /* ==========================================
+       4. 本棚 ＆ 執筆（原稿・本スタイル）ビュー
+       ========================================== */
+    /* 本棚 */
+    .bookshelf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .book-item {
+      background: var(--accent-warm);
+      color: var(--bg-paper);
+      height: 190px;
+      border-radius: 4px 8px 8px 4px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 3px 4px 8px rgba(0,0,0,0.15);
+      border-left: 8px solid var(--accent-brown);
+      transition: transform 0.2s;
+    }
+
+    .book-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .book-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    /* エディタ／本形式ビュー */
+    .editor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
     .btn {
-      width: 100%; background: var(--primary); color: #fff;
-      padding: 14px; border: none; border-radius: 8px;
-      font-size: 1rem; font-weight: bold; cursor: pointer; text-align: center;
+      background-color: var(--accent-warm);
+      color: var(--bg-paper);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    .book-container {
+      flex: 1;
+      background-color: var(--bg-paper);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 4px;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .item-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-    .item-card {
-      background: #fff; padding: 16px; border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer;
-      border-left: 4px solid var(--primary);
+    /* 横書き・縦書き切り替えクラス */
+    .writing-horizontal {
+      writing-mode: horizontal-tb;
+      line-height: 1.8;
+      font-size: 1.05rem;
     }
 
-    /* モーダル（新規作成用ダイアログ） */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 200; padding: 16px;
+    .writing-vertical {
+      writing-mode: vertical-rl;
+      line-height: 2.0;
+      font-size: 1.05rem;
+      height: 500px;
+      overflow-x: auto;
     }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff; padding: 24px; border-radius: var(--border-radius);
-      width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+
+    .editor-textarea {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      color: var(--text-color);
+    }
+
+    /* ==========================================
+       5. 『物語の設定』ビュー（自由項目定義）
+       ========================================== */
+    .setting-category-block {
+      background: var(--bg-paper);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-warm);
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+
+    .category-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent-brown);
+    }
+
+    .setting-card {
+      background: var(--bg-main);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--accent-warm);
+    }
+
+    .setting-field-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .field-key {
+      font-weight: bold;
+      color: var(--accent-brown);
+      min-width: 90px;
+    }
+
+    /* ==========================================
+       6. 『物語別アイディア』ビュー（付箋ボード）
+       ========================================== */
+    .idea-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      padding-top: 10px;
+    }
+
+    .idea-sticky {
+      background-color: var(--sticky-yellow);
+      padding: 15px;
+      border-radius: 2px;
+      box-shadow: 2px 3px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+      transform: rotate(-1deg);
+      transition: transform 0.2s;
+    }
+
+    .idea-sticky:nth-child(even) {
+      transform: rotate(1deg);
+    }
+
+    .idea-sticky:hover {
+      transform: scale(1.02) rotate(0deg);
+    }
+
+    .idea-content {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .idea-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 0.8rem;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">🌿 マイ創作ノート</div>
-  </header>
+  <!-- オーバーレイ -->
+  <div id="overlay" onclick="toggleSidebar(false)"></div>
 
-  <div class="container">
-    
-    <!-- ホーム画面 -->
-    <div id="page-home" class="page active">
-      <div class="hero-title">
-        <p>MY STORY STUDIO</p>
-        <h1>言葉を紡ぎ、本を創る時間</h1>
+  <!-- スライドアウト サイドバー -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <span>メニュー</span>
+      <span style="cursor:pointer;" onclick="toggleSidebar(false)">✕</span>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="switchView('bookshelf')">📚 本棚</li>
+      <li class="nav-item" onclick="switchView('editor')">✍️ 原稿執筆</li>
+      <li class="nav-item" onclick="switchView('settings')">🏛️ 物語の設定</li>
+      <li class="nav-item" onclick="switchView('ideas')">💡 物語別アイディア</li>
+    </ul>
+  </nav>
+
+  <!-- メインコンテンツ領域 -->
+  <div id="main-wrapper">
+    <header>
+      <button class="menu-btn" onclick="toggleSidebar(true)">☰</button>
+      <div class="header-title" id="header-title">本棚</div>
+      <div style="width: 30px;"></div> <!-- バランサー -->
+    </header>
+
+    <!-- 1. 本棚ビュー -->
+    <section id="view-bookshelf" class="view-section active">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>作成した本一覧</h3>
+        <button class="btn" onclick="createNewBook()">+ 新しい本を作成</button>
       </div>
-      <div class="menu-list">
-        <div class="menu-card" onclick="openNewBookModal()">
-          <div class="icon-box">➕</div>
-          <div class="menu-info">
-            <h3>新規作品を作成</h3>
-            <p>題名を決めて新しい物語やエッセイを書き始める</p>
-          </div>
-          <span>🍃</span>
-        </div>
-        <div class="menu-card" onclick="navigateTo('edit')">
-          <div class="icon-box">✏️</div>
-          <div class="menu-info">
-            <h3>物語編集</h3>
-            <p>執筆中の作品の続きを書く・推敲する</p>
-          </div>
-          <span>🌿</span>
-        </div>
-        <div class="menu-card" onclick="navigateTo('ideas')">
-          <div class="icon-box">💡</div>
-          <div class="menu-info">
-            <h3>物語別アイディア</h3>
-            <p>プロット、伏線メモ、作品ごとのひらめき</p>
-          </div>
-          <span>🌱</span>
-        </div>
-        <div class="menu-card" onclick="navigateTo('materials')">
-          <div class="icon-box">📁</div>
-          <div class="menu-info">
-            <h3>物語別資料集</h3>
-            <p>世界観設定、登場人物、参考リンク・ノート</p>
-          </div>
-          <span>🍀</span>
-        </div>
-        <div class="menu-card" onclick="navigateTo('read')">
-          <div class="icon-box">📖</div>
-          <div class="menu-info">
-            <h3>創作物を読む（本棚）</h3>
-            <p>完成した本を選んでじっくり読書する</p>
-          </div>
-          <span>📚</span>
-        </div>
+      <div class="bookshelf-grid" id="bookshelf-grid">
+        <!-- JSで本が動的に挿入されます -->
       </div>
-    </div>
+    </section>
 
-    <!-- 編集画面 -->
-    <div id="page-edit" class="page">
-      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
-      <h2>物語編集</h2>
-      <div id="edit-book-list" class="item-list"></div>
-      <div id="editor-area" style="display:none; margin-top:20px;">
-        <h3 id="current-book-title"></h3>
-        <textarea id="editor-content" rows="15" placeholder="ここに本文を書き進めましょう..."></textarea>
-        <button class="btn" onclick="saveCurrentBook()">保存する</button>
+    <!-- 2. 原稿執筆ビュー -->
+    <section id="view-editor" class="view-section">
+      <div class="book-selector-bar">
+        <label>執筆中の作品:</label>
+        <select id="editor-book-select" onchange="onEditorBookChange()"></select>
       </div>
-    </div>
+      <div class="editor-toolbar">
+        <div>
+          <button class="btn btn-small" onclick="toggleWritingMode()">縦書き / 横書き 切替</button>
+        </div>
+        <button class="btn btn-small" onclick="saveCurrentBookText()">保存</button>
+      </div>
+      <div class="book-container writing-horizontal" id="book-container">
+        <textarea id="editor-textarea" class="editor-textarea" placeholder="ここに物語を執筆します..."></textarea>
+      </div>
+    </section>
 
-    <!-- アイディア画面 -->
-    <div id="page-ideas" class="page">
-      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
-      <h2>物語別アイディア</h2>
-      <div id="ideas-list" class="item-list"></div>
-    </div>
+    <!-- 3. 物語の設定ビュー -->
+    <section id="view-settings" class="view-section">
+      <div class="book-selector-bar">
+        <label>作品の選択:</label>
+        <select id="settings-book-select" onchange="renderSettings()"></select>
+        <button class="btn btn-small" onclick="addSettingCategory()" style="margin-left:auto;">+ 設定カテゴリを追加 (例: 国, 魔法)</button>
+      </div>
+      <div id="settings-container">
+        <!-- カテゴリ＆設定項目が動的に描画されます -->
+      </div>
+    </section>
 
-    <!-- 資料集画面 -->
-    <div id="page-materials" class="page">
-      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
-      <h2>物語別資料集</h2>
-      <div id="materials-list" class="item-list"></div>
-    </div>
-
-    <!-- 読書画面 -->
-    <div id="page-read" class="page">
-      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
-      <h2>本棚（読書）</h2>
-      <div id="read-list" class="item-list"></div>
-    </div>
-
-  </div>
-
-  <!-- 新規作成ダイアログ -->
-  <div id="new-book-modal" class="modal">
-    <div class="modal-content">
-      <h3>新しい作品の題名</h3>
-      <p style="font-size:0.85rem; color:#666; margin-top:4px;">物語やエッセイのタイトルを入力してください</p>
-      <input type="text" id="new-book-title" placeholder="作品のタイトル...">
-      <button class="btn" onclick="createNewBook()">作成して執筆をはじめる</button>
-      <button class="back-btn" style="width:100%; text-align:center; margin-top:8px;" onclick="closeNewBookModal()">キャンセル</button>
-    </div>
+    <!-- 4. 物語別アイディアビュー -->
+    <section id="view-ideas" class="view-section">
+      <div class="book-selector-bar">
+        <label>作品の選択:</label>
+        <select id="ideas-book-select" onchange="renderIdeas()"></select>
+      </div>
+      <div style="margin-bottom: 15px; display:flex; gap:10px;">
+        <input type="text" id="new-idea-input" placeholder="思いついたアイディアやメモを入力..." style="flex:1; padding:8px 12px; border:1px solid var(--border-color); border-radius:4px;">
+        <button class="btn" onclick="addIdea()">メモを貼る</button>
+      </div>
+      <div class="idea-board" id="idea-board">
+        <!-- 付箋メモが動的に挿入されます -->
+      </div>
+    </section>
   </div>
 
   <script>
-    // データ管理（localStorage）
-    let books = JSON.parse(localStorage.getItem('my_novels') || '[]');
-    let currentBookIndex = null;
+    /* ==========================================
+       データ構造＆状態管理
+       ========================================== */
+    let appData = {
+      currentBookId: 1,
+      books: [
+        {
+          id: 1,
+          title: "グランベルク戦記",
+          content: "第一章　王国の黄昏\n\n広大な大陸の東方に位置するグランベルク王国。その古き城塞都市に、静かに朝靄が立ち込めていた……",
+          settings: [
+            {
+              categoryName: "国・勢力",
+              items: [
+                { name: "グランベルク王国", details: { "国力": "中規模（農業中心）", "所属騎士": "聖幻騎士団", "特産品": "銀鉱石、ワイン" } },
+                { name: "バルバロス帝国", details: { "国力": "大国（軍事強国）", "所属騎士": "黒鋼騎兵隊", "特産品": "魔導兵器" } }
+              ]
+            },
+            {
+              categoryName: "魔法体系",
+              items: [
+                { name: "古代精霊魔法", details: { "分類": "自然系", "代表技": "ヴォルテックス・ブレイズ", "得意な者": "エルフ族、高位導師" } }
+              ]
+            }
+          ],
+          ideas: [
+            { id: 101, text: "主人公のライバルは実は帝国の第三皇子にする？", date: "2026/10/06" },
+            { id: 102, text: "3章の決戦の舞台は霧の深い渓谷。視界不良での戦術戦。", date: "2026/10/06" }
+          ]
+        }
+      ]
+    };
 
-    // 画面遷移・履歴管理（端末の「戻る」ボタン連携）
-    function navigateTo(pageId, isBack = false) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const targetPage = document.getElementById('page-' + pageId);
-      if (targetPage) targetPage.classList.add('active');
+    let isVertical = false;
 
-      if (!isBack) {
-        history.pushState({ page: pageId }, '', '#' + pageId);
-      }
-      
-      if (pageId === 'edit') renderEditList();
-      if (pageId === 'ideas') renderIdeas();
-      if (pageId === 'materials') renderMaterials();
-      if (pageId === 'read') renderReadList();
-    }
+    // 初期化
+    window.onload = () => {
+      initDrawerSwipe();
+      updateBookSelectors();
+      renderBookshelf();
+      renderSettings();
+      renderIdeas();
+    };
 
-    // ブラウザ・端末の「戻る」ボタンが押された時の処理
-    window.onpopstate = function(event) {
-      if (event.state && event.state.page) {
-        navigateTo(event.state.page, true);
+    /* ==========================================
+       スライドアウト・左スワイプ処理
+       ========================================== */
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    let touchStartX = 0;
+
+    function toggleSidebar(open) {
+      if (open) {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
       } else {
-        navigateTo('home', true);
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
       }
-    };
-
-    // 初期化（URLハッシュチェック）
-    window.onload = function() {
-      history.replaceState({ page: 'home' }, '', '#home');
-    };
-
-    // 新規作成ダイアログ
-    function openNewBookModal() {
-      document.getElementById('new-book-modal').classList.add('active');
-      document.getElementById('new-book-title').focus();
-    }
-    function closeNewBookModal() {
-      document.getElementById('new-book-modal').classList.remove('active');
-      document.getElementById('new-book-title').value = '';
     }
 
-    // 作品の新規作成
+    function initDrawerSwipe() {
+      // 左端からのスワイプ検知
+      document.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+      });
+
+      document.addEventListener('touchend', e => {
+        let touchEndX = e.changedTouches[0].clientX;
+        // 左端(50px以内)からの右スワイプでオープン
+        if (touchStartX < 50 && touchEndX - touchStartX > 70) {
+          toggleSidebar(true);
+        }
+        // メニューオープン中の左スワイプでクローズ
+        if (sidebar.classList.contains('open') && touchStartX - touchEndX > 70) {
+          toggleSidebar(false);
+        }
+      });
+    }
+
+    /* ==========================================
+       画面切替機能
+       ========================================== */
+    function switchView(viewName) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      if(targetView) targetView.classList.add('active');
+
+      const headerTitle = document.getElementById('header-title');
+      if (viewName === 'bookshelf') headerTitle.innerText = "本棚";
+      if (viewName === 'editor') headerTitle.innerText = "原稿執筆";
+      if (viewName === 'settings') headerTitle.innerText = "物語の設定";
+      if (viewName === 'ideas') headerTitle.innerText = "物語別アイディア";
+
+      toggleSidebar(false);
+    }
+
+    /* ==========================================
+       1. 本棚機能
+       ========================================== */
+    function renderBookshelf() {
+      const grid = document.getElementById('bookshelf-grid');
+      grid.innerHTML = "";
+      appData.books.forEach(book => {
+        const item = document.createElement('div');
+        item.className = 'book-item';
+        item.innerHTML = `
+          <div class="book-title">${escapeHTML(book.title)}</div>
+          <div style="font-size:0.75rem; opacity:0.8;">タップして開く</div>
+        `;
+        item.onclick = () => openBookInEditor(book.id);
+        grid.appendChild(item);
+      });
+    }
+
     function createNewBook() {
-      const title = document.getElementById('new-book-title').value.trim();
-      if (!title) {
-        alert('タイトルを入力してください');
+      const title = prompt("新しい本（作品）のタイトルを入力してください:", "無題の物語");
+      if (!title) return;
+      const newBook = {
+        id: Date.now(),
+        title: title,
+        content: "",
+        settings: [],
+        ideas: []
+      };
+      appData.books.push(newBook);
+      appData.currentBookId = newBook.id;
+      updateBookSelectors();
+      renderBookshelf();
+      openBookInEditor(newBook.id);
+    }
+
+    function updateBookSelectors() {
+      const selects = ['editor-book-select', 'settings-book-select', 'ideas-book-select'];
+      selects.forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = "";
+        appData.books.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          opt.innerText = b.title;
+          if (b.id === appData.currentBookId) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    /* ==========================================
+       2. 原稿執筆機能
+       ========================================== */
+    function openBookInEditor(bookId) {
+      appData.currentBookId = bookId;
+      updateBookSelectors();
+      const book = appData.books.find(b => b.id === bookId);
+      if (book) {
+        document.getElementById('editor-textarea').value = book.content;
+      }
+      switchView('editor');
+    }
+
+    function onEditorBookChange() {
+      const selectedId = parseInt(document.getElementById('editor-book-select').value);
+      saveCurrentBookText();
+      appData.currentBookId = selectedId;
+      const book = appData.books.find(b => b.id === selectedId);
+      if (book) document.getElementById('editor-textarea').value = book.content;
+    }
+
+    function saveCurrentBookText() {
+      const book = appData.books.find(b => b.id === appData.currentBookId);
+      if (book) {
+        book.content = document.getElementById('editor-textarea').value;
+      }
+    }
+
+    function toggleWritingMode() {
+      const container = document.getElementById('book-container');
+      isVertical = !isVertical;
+      if (isVertical) {
+        container.classList.remove('writing-horizontal');
+        container.classList.add('writing-vertical');
+      } else {
+        container.classList.remove('writing-vertical');
+        container.classList.add('writing-horizontal');
+      }
+    }
+
+    /* ==========================================
+       3. 物語の設定（自由項目拡張）
+       ========================================== */
+    function getSelectedBook(selectId) {
+      const id = parseInt(document.getElementById(selectId).value);
+      return appData.books.find(b => b.id === id);
+    }
+
+    function renderSettings() {
+      const book = getSelectedBook('settings-book-select');
+      const container = document.getElementById('settings-container');
+      container.innerHTML = "";
+
+      if (!book || !book.settings || book.settings.length === 0) {
+        container.innerHTML = `<div style="color:#777; padding:20px;">設定カテゴリがまだありません。「+ 設定カテゴリを追加」ボタンから作成できます。</div>`;
         return;
       }
-      const newBook = { title: title, content: '', created: new Date().toLocaleDateString() };
-      books.push(newBook);
-      localStorage.setItem('my_novels', JSON.stringify(books));
-      
-      closeNewBookModal();
-      navigateTo('edit');
-      openEditor(books.length - 1);
+
+      book.settings.forEach((cat, catIdx) => {
+        const catBlock = document.createElement('div');
+        catBlock.className = 'setting-category-block';
+        
+        let itemsHtml = "";
+        cat.items.forEach((item, itemIdx) => {
+          let detailsHtml = "";
+          for (let [key, val] of Object.entries(item.details)) {
+            detailsHtml += `
+              <div class="setting-field-row">
+                <span class="field-key">${escapeHTML(key)}:</span>
+                <span>${escapeHTML(val)}</span>
+              </div>
+            `;
+          }
+
+          itemsHtml += `
+            <div class="setting-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="color:var(--accent-brown);">${escapeHTML(item.name)}</strong>
+                <button class="btn btn-small" style="background:#cc5555;" onclick="deleteSettingItem(${catIdx}, ${itemIdx})">削除</button>
+              </div>
+              ${detailsHtml}
+              <button class="btn btn-small" style="margin-top:8px; background:var(--accent-warm);" onclick="addFieldToItem(${catIdx}, ${itemIdx})">+ 項目を追加 (属性)</button>
+            </div>
+          `;
+        });
+
+        catBlock.innerHTML = `
+          <div class="category-header">
+            <span class="category-title">${escapeHTML(cat.categoryName)}</span>
+            <button class="btn btn-small" onclick="addSettingItem(${catIdx})">+ ${escapeHTML(cat.categoryName)}を追加</button>
+          </div>
+          <div>${itemsHtml || '<p style="color:#888; font-size:0.9rem;">項目がありません</p>'}</div>
+        `;
+        container.appendChild(catBlock);
+      });
     }
 
-    // 編集画面の描画
-    function renderEditList() {
-      const container = document.getElementById('edit-book-list');
-      if (books.length === 0) {
-        container.innerHTML = '<p style="color:#888;">まだ作品がありません。「新規作品を作成」から作成してください。</p>';
-        return;
+    function addSettingCategory() {
+      const book = getSelectedBook('settings-book-select');
+      if (!book) return;
+      const name = prompt("追加する設定カテゴリ名を入力してください (例: 国, 魔法, 登場人物, 武器):");
+      if (!name) return;
+      if (!book.settings) book.settings = [];
+      book.settings.push({ categoryName: name, items: [] });
+      renderSettings();
+    }
+
+    function addSettingItem(catIdx) {
+      const book = getSelectedBook('settings-book-select');
+      const cat = book.settings[catIdx];
+      const itemName = prompt(`${cat.categoryName}の名称を入力してください:`);
+      if (!itemName) return;
+
+      cat.items.push({ name: itemName, details: {} });
+      renderSettings();
+    }
+
+    function addFieldToItem(catIdx, itemIdx) {
+      const book = getSelectedBook('settings-book-select');
+      const item = book.settings[catIdx].items[itemIdx];
+      const key = prompt("追加したい属性名を入力してください (例: 国力, 所属騎士, 技名, 効果):");
+      if (!key) return;
+      const val = prompt(`${key} の内容を入力してください:`);
+      if (val === null) return;
+
+      item.details[key] = val;
+      renderSettings();
+    }
+
+    function deleteSettingItem(catIdx, itemIdx) {
+      const book = getSelectedBook('settings-book-select');
+      if (confirm("この設定項目を削除しますか？")) {
+        book.settings[catIdx].items.splice(itemIdx, 1);
+        renderSettings();
       }
-      container.innerHTML = books.map((b, i) => `
-        <div class="item-card" onclick="openEditor(${i})">
-          <strong>${b.title}</strong>
-          <p style="font-size:0.8rem; color:#888; margin-top:4px;">作成日: ${b.created}</p>
-        </div>
-      `).join('');
     }
 
-    function openEditor(index) {
-      currentBookIndex = index;
-      document.getElementById('edit-book-list').style.display = 'none';
-      document.getElementById('editor-area').style.display = 'block';
-      document.getElementById('current-book-title').innerText = books[index].title;
-      document.getElementById('editor-content').value = books[index].content || '';
-    }
-
-    function saveCurrentBook() {
-      if (currentBookIndex === null) return;
-      books[currentBookIndex].content = document.getElementById('editor-content').value;
-      localStorage.setItem('my_novels', JSON.stringify(books));
-      alert('保存しました！');
-    }
-
+    /* ==========================================
+       4. 物語別アイディア（メモ貼り付け機能）
+       ========================================== */
     function renderIdeas() {
-      document.getElementById('ideas-list').innerHTML = books.length ? 
-        books.map(b => `<div class="item-card"><strong>${b.title} のアイディア</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">メモや伏線を記録...</p></div>`).join('') :
-        '<p style="color:#888;">作品がありません。</p>';
+      const book = getSelectedBook('ideas-book-select');
+      const board = document.getElementById('idea-board');
+      board.innerHTML = "";
+
+      if (!book || !book.ideas || book.ideas.length === 0) {
+        board.innerHTML = `<div style="color:#777; grid-column:1/-1;">アイディアメモはまだありません。上のフォームから思いついたことをメモできます。</div>`;
+        return;
+      }
+
+      book.ideas.forEach(idea => {
+        const sticky = document.createElement('div');
+        sticky.className = 'idea-sticky';
+        sticky.innerHTML = `
+          <div class="idea-content">${escapeHTML(idea.text)}</div>
+          <div class="idea-footer">
+            <span>${idea.date}</span>
+            <button class="btn btn-small" style="background:#cc5555;" onclick="deleteIdea(${idea.id})">削除</button>
+          </div>
+        `;
+        board.appendChild(sticky);
+      });
     }
 
-    function renderMaterials() {
-      document.getElementById('materials-list').innerHTML = books.length ? 
-        books.map(b => `<div class="item-card"><strong>${b.title} の資料集</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">キャラクターや世界観設定...</p></div>`).join('') :
-        '<p style="color:#888;">作品がありません。</p>';
+    function addIdea() {
+      const book = getSelectedBook('ideas-book-select');
+      const input = document.getElementById('new-idea-input');
+      const text = input.value.trim();
+      if (!text || !book) return;
+
+      if (!book.ideas) book.ideas = [];
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
+
+      book.ideas.push({
+        id: Date.now(),
+        text: text,
+        date: dateStr
+      });
+
+      input.value = "";
+      renderIdeas();
     }
 
-    function renderReadList() {
-      document.getElementById('read-list').innerHTML = books.length ? 
-        books.map(b => `<div class="item-card"><strong>${b.title}</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">${b.content.substring(0, 40)}...</p></div>`).join('') :
-        '<p style="color:#888;">本棚は空です。</p>';
+    function deleteIdea(ideaId) {
+      const book = getSelectedBook('ideas-book-select');
+      if (!book) return;
+      book.ideas = book.ideas.filter(i => i.id !== ideaId);
+      renderIdeas();
+    }
+
+    // ユーティリティ: HTMLエスケープ
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
     }
   </script>
 </body>
