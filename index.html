@@ -2,857 +2,318 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>マイ創作ノート - 葉っぱの小説・読書アプリ</title>
-
-  <!-- iOS & Mobile Web App Meta Tags -->
-  <meta name="theme-color" content="#4a7c59">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="マイ創作ノート">
-  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%234a7c59'/><path d='M50 18 C22 32 22 68 50 82 C78 68 78 32 50 18 Z' fill='%23f7f3e9'/><path d='M50 18 L50 82' stroke='%234a7c59' stroke-width='4'/></svg>">
-
-  <!-- Dynamic PWA Manifest Injection -->
-  <script>
-    (function() {
-      const manifest = {
-        name: "マイ創作ノート",
-        short_name: "創作ノート",
-        description: "自分だけの物語・エッセイ執筆＆本棚（読書）アプリ",
-        start_url: "./",
-        display: "standalone",
-        background_color: "#f2f7f4",
-        theme_color: "#4a7c59",
-        orientation: "any",
-        icons: [
-          {
-            src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%234a7c59'/><path d='M50 18 C22 32 22 68 50 82 C78 68 78 32 50 18 Z' fill='%23f7f3e9'/><path d='M50 18 L50 82' stroke='%234a7c59' stroke-width='4'/></svg>",
-            sizes: "192x192 512x512",
-            type: "image/svg+xml",
-            purpose: "any maskable"
-          }
-        ]
-      };
-      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-      const manifestUrl = URL.createObjectURL(blob);
-      const link = document.createElement('link');
-      link.rel = 'manifest';
-      link.href = manifestUrl;
-      document.head.appendChild(link);
-    })();
-  </script>
-
-  <!-- Tailwind CSS & Lucide Icons CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'bg-main': '#f2f7f4',
-            'card-bg': '#ffffff',
-            'accent-green': '#4a7c59',
-            'accent-hover': '#3b6347',
-            'paper-bg': '#f7f3e9',
-            'paper-border': '#e6dec8',
-            'sidebar-bg': '#eaf0ec',
-            'text-dark': '#2d3732',
-            'ink-dark': '#2b2621'
-          },
-          fontFamily: {
-            serif: ['"Hiragino Mincho ProN"', '"Yu Mincho"', '"游明朝"', 'Georgia', 'serif'],
-            sans: ['system-ui', '-apple-system', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイ創作ノート</title>
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuODnuOCpOaJm-S9nOpatchesiIiwKICAic2hvcnRfbmFtZSI6ICLnmLPlipPjg4bjg4kiLAogICJzdGFydF91cmwiOiAiaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y3ZjlmanIiLAogICJ0aGVtZV9jb2xvciI6ICIjMmU3ZDMyIgp9">
   <style>
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(74, 124, 89, 0.05);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #c2d4c7;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #4a7c59;
+    :root {
+      --bg-color: #f7f9f7;
+      --card-bg: #ffffff;
+      --primary: #2e7d32;
+      --primary-light: #e8f5e9;
+      --text: #2c3e50;
+      --text-sub: #666666;
+      --shadow: 0 4px 15px rgba(46, 125, 50, 0.08);
+      --border-radius: 16px;
     }
 
-    /* Vertical Writing Style */
-    .vertical-mode {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-      height: 100% !important;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text); padding-bottom: 40px; min-height: 100vh; }
+    
+    header {
+      background: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .vertical-mode .paper-title {
-      border-bottom: none !important;
-      border-left: 1px dashed #d1c7b2 !important;
-      padding-bottom: 0 !important;
-      padding-left: 0.75rem !important;
-      margin-bottom: 0 !important;
-      margin-left: 1.5rem !important;
-      height: 100%;
+    .logo { font-size: 1.2rem; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    
+    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .hero-title { text-align: center; margin: 20px 0 30px; }
+    .hero-title h1 { font-size: 1.4rem; color: var(--primary); font-weight: 600; letter-spacing: 2px; }
+    .hero-title p { font-size: 0.85rem; color: var(--text-sub); margin-top: 6px; }
+
+    .menu-list { display: flex; flex-direction: column; gap: 16px; }
+    .menu-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(46, 125, 50, 0.1);
     }
-    .vertical-mode .paper-textarea {
-      height: 100% !important;
-      width: auto !important;
+    .menu-card:active { transform: scale(0.98); }
+    .icon-box {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--primary-light); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .menu-info { flex-grow: 1; }
+    .menu-info h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 4px; }
+    .menu-info p { font-size: 0.8rem; color: var(--text-sub); }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; color: var(--primary);
+      font-size: 0.95rem; font-weight: bold; cursor: pointer; padding: 8px 0; margin-bottom: 16px;
     }
 
-    /* Subtle Paper Texture */
-    .paper-texture {
-      background-color: #f7f3e9;
-      background-image: radial-gradient(#e2d9c5 0.75px, transparent 0.75px);
-      background-size: 16px 16px;
+    input, textarea, select {
+      width: 100%; padding: 12px 16px; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 1rem; margin-top: 8px; margin-bottom: 16px;
+      outline: none; background: #fff;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    
+    .btn {
+      width: 100%; background: var(--primary); color: #fff;
+      padding: 14px; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: bold; cursor: pointer; text-align: center;
     }
 
-    /* Book Spine Animation & Card Styling */
-    .book-card {
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-    }
-    .book-card:hover {
-      transform: translateY(-6px) rotate(-1deg);
+    .item-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .item-card {
+      background: #fff; padding: 16px; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer;
+      border-left: 4px solid var(--primary);
     }
 
-    /* Safe Area padding for mobile notches */
-    .pb-safe {
-      padding-bottom: env(safe-area-inset-bottom);
+    /* モーダル（新規作成用ダイアログ） */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 200; padding: 16px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #fff; padding: 24px; border-radius: var(--border-radius);
+      width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
   </style>
 </head>
-<body class="bg-bg-main text-text-dark font-serif min-h-screen flex flex-col antialiased selection:bg-accent-green selection:text-white pb-safe">
+<body>
 
-  <header class="bg-card-bg border-b border-emerald-100 shadow-sm sticky top-0 z-30 px-4 py-3 flex justify-between items-center">
-    <div class="flex items-center space-x-3">
-      <!-- Mobile Sidebar Drawer Trigger -->
-      <button id="mobile-sidebar-toggle" onclick="toggleSidebar()" class="hidden p-1.5 rounded-lg text-accent-green hover:bg-emerald-50 focus:outline-none">
-        <i data-lucide="menu" class="w-6 h-6"></i>
-      </button>
-
-      <!-- Header Title -->
-      <div class="flex items-center space-x-2 cursor-pointer" onclick="showMenu()">
-        <span class="text-accent-green inline-block transition-transform hover:rotate-12 duration-300">
-          <i data-lucide="leaf" class="w-6 h-6 fill-current"></i>
-        </span>
-        <h1 id="header-title" class="text-lg md:text-xl font-medium tracking-wide text-accent-green">マイ創作ノート</h1>
-      </div>
-    </div>
-
-    <!-- Header Right Buttons -->
-    <div class="flex items-center space-x-2">
-      <!-- Installation Prompt Trigger Button -->
-      <button onclick="openInstallModal()" class="flex items-center space-x-1 text-xs bg-emerald-100/70 text-accent-green hover:bg-accent-green hover:text-white px-2.5 py-1.5 rounded-full transition-colors font-sans">
-        <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">スマホにインストール</span>
-      </button>
-
-      <!-- Workspace Editor Tools -->
-      <div id="editor-tools" class="hidden flex items-center space-x-2">
-        <button onclick="toggleWritingMode()" id="mode-toggle-btn" class="flex items-center space-x-1 text-xs md:text-sm bg-emerald-50 text-accent-green border border-emerald-200 px-2.5 py-1.5 rounded-full hover:bg-accent-green hover:text-white transition-colors">
-          <i data-lucide="align-left" id="mode-icon" class="w-4 h-4"></i>
-          <span id="mode-text" class="hidden sm:inline">縦書きに切替</span>
-        </button>
-
-        <div class="bg-emerald-50 border border-emerald-200 text-accent-green text-xs md:text-sm px-3 py-1.5 rounded-full flex items-center space-x-1 font-sans">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-          <span><span id="char-count">0</span> 字</span>
-        </div>
-      </div>
-
-      <!-- Back Button -->
-      <button id="back-btn" onclick="showMenu()" class="hidden flex items-center space-x-1 text-xs md:text-sm border border-accent-green text-accent-green px-3 py-1.5 rounded-full hover:bg-accent-green hover:text-white transition-all shadow-sm font-sans">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">カテゴリ一覧</span>
-      </button>
-    </div>
+  <header>
+    <div class="logo">🌿 マイ創作ノート</div>
   </header>
 
-  <main id="menu-view" class="max-w-4xl w-full mx-auto px-4 py-8 md:py-12 flex-1 flex flex-col justify-center">
-    <div class="text-center mb-8">
-      <p class="text-xs md:text-sm text-gray-500 font-sans tracking-widest uppercase">My Story Studio</p>
-      <h2 class="text-2xl md:text-3xl font-normal text-emerald-900 mt-1">言葉を紡ぎ、本を創る時間</h2>
-    </div>
-
-    <!-- 5 Staggered Categories -->
-    <div class="flex flex-col gap-5 md:gap-6">
-      
-      <!-- 1. 新規作成 (Left) -->
-      <div onclick="openWorkspace('新規作成')" class="group cursor-pointer w-full md:w-[82%] self-start bg-card-bg hover:bg-emerald-50/50 p-4 md:p-5 rounded-2xl shadow-sm hover:shadow-md border-l-4 border-accent-green transition-all duration-300 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100/70 text-accent-green rounded-xl group-hover:scale-110 transition-transform">
-            <i data-lucide="plus-circle" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 group-hover:text-accent-green transition-colors">新規作成</h3>
-            <p class="text-xs text-gray-500 font-sans">作品（群）を選んで新しい章や書き下ろしを追加</p>
-          </div>
-        </div>
-        <span class="text-2xl">🍃</span>
-      </div>
-
-      <!-- 2. 物語編集 (Right - Staggered) -->
-      <div onclick="openWorkspace('物語編集')" class="group cursor-pointer w-full md:w-[82%] self-end bg-card-bg hover:bg-emerald-50/50 p-4 md:p-5 rounded-2xl shadow-sm hover:shadow-md border-l-4 border-accent-green transition-all duration-300 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100/70 text-accent-green rounded-xl group-hover:scale-110 transition-transform">
-            <i data-lucide="edit-3" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 group-hover:text-accent-green transition-colors">物語編集</h3>
-            <p class="text-xs text-gray-500 font-sans">執筆中の小説やエッセイの続きを書く・推敲する</p>
-          </div>
-        </div>
-        <span class="text-2xl">🌿</span>
-      </div>
-
-      <!-- 3. 物語別アイディア (Left) -->
-      <div onclick="openWorkspace('物語別アイディア')" class="group cursor-pointer w-full md:w-[82%] self-start bg-card-bg hover:bg-emerald-50/50 p-4 md:p-5 rounded-2xl shadow-sm hover:shadow-md border-l-4 border-accent-green transition-all duration-300 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100/70 text-accent-green rounded-xl group-hover:scale-110 transition-transform">
-            <i data-lucide="lightbulb" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 group-hover:text-accent-green transition-colors">物語別アイディア</h3>
-            <p class="text-xs text-gray-500 font-sans">プロット、伏線メモ、作品ごとのひらめき</p>
-          </div>
-        </div>
-        <span class="text-2xl">🌱</span>
-      </div>
-
-      <!-- 4. 物語別資料集 (Right - Staggered) -->
-      <div onclick="openWorkspace('物語別資料集')" class="group cursor-pointer w-full md:w-[82%] self-end bg-card-bg hover:bg-emerald-50/50 p-4 md:p-5 rounded-2xl shadow-sm hover:shadow-md border-l-4 border-accent-green transition-all duration-300 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100/70 text-accent-green rounded-xl group-hover:scale-110 transition-transform">
-            <i data-lucide="folder-open" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 group-hover:text-accent-green transition-colors">物語別資料集</h3>
-            <p class="text-xs text-gray-500 font-sans">世界観設定、登場人物、参考リンク・ノート</p>
-          </div>
-        </div>
-        <span class="text-2xl">☘️</span>
-      </div>
-
-      <!-- 5. 創作物を読む (Bookshelf View) (Left) -->
-      <div onclick="openBookshelf()" class="group cursor-pointer w-full md:w-[82%] self-start bg-card-bg hover:bg-emerald-50/50 p-4 md:p-5 rounded-2xl shadow-sm hover:shadow-md border-l-4 border-accent-green transition-all duration-300 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100/70 text-accent-green rounded-xl group-hover:scale-110 transition-transform">
-            <i data-lucide="book-open-check" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 group-hover:text-accent-green transition-colors">創作物を読む（本棚）</h3>
-            <p class="text-xs text-gray-500 font-sans">完成した群・本を選んでじっくり読書する</p>
-          </div>
-        </div>
-        <span class="text-2xl">📖</span>
-      </div>
-
-    </div>
-  </main>
-
-  <main id="bookshelf-view" class="hidden max-w-5xl w-full mx-auto px-4 py-8 flex-1 flex flex-col">
-    <div class="flex justify-between items-center mb-6 pb-2 border-b border-emerald-200">
-      <div>
-        <h2 class="text-2xl font-bold text-emerald-900 flex items-center gap-2">
-          <span>📖</span> マイ本棚（作品・群一覧）
-        </h2>
-        <p class="text-xs text-gray-500 font-sans mt-0.5">作成した本（群）を選択して読書・閲覧ができます</p>
-      </div>
-
-      <button onclick="createNewGroupModal()" class="bg-accent-green hover:bg-accent-hover text-white text-xs md:text-sm px-3.5 py-2 rounded-xl font-sans flex items-center space-x-1 shadow transition-all">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-        <span>新しい本（群）を作る</span>
-      </button>
-    </div>
-
-    <!-- Bookshelf Grid -->
-    <div id="bookshelf-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-      <!-- Books injected dynamically -->
-    </div>
-  </main>
-
-  <div id="workspace-view" class="hidden flex-1 h-[calc(100vh-57px)] overflow-hidden relative">
+  <div class="container">
     
-    <!-- Mobile Sidebar Backdrop Overlay -->
-    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/30 z-10 md:hidden hidden transition-opacity"></div>
-
-    <!-- Left Sidebar: Chapter List & Work Selection -->
-    <aside id="sidebar" class="absolute md:relative z-20 w-80 h-full bg-sidebar-bg border-r border-emerald-200/80 p-4 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 shadow-lg md:shadow-none">
-      
-      <!-- Work / Group Selector Banner -->
-      <div class="mb-4 bg-card-bg p-3 rounded-xl border border-emerald-200 shadow-sm">
-        <label class="text-[10px] font-bold text-accent-green font-sans uppercase tracking-wider block mb-1">現在の作品（群）</label>
-        <div class="flex items-center justify-between">
-          <select id="work-group-select" onchange="changeActiveGroup(this.value)" class="w-full bg-transparent font-bold text-sm text-gray-800 outline-none cursor-pointer">
-            <!-- Dynamically populated -->
-          </select>
+    <!-- ホーム画面 -->
+    <div id="page-home" class="page active">
+      <div class="hero-title">
+        <p>MY STORY STUDIO</p>
+        <h1>言葉を紡ぎ、本を創る時間</h1>
+      </div>
+      <div class="menu-list">
+        <div class="menu-card" onclick="openNewBookModal()">
+          <div class="icon-box">➕</div>
+          <div class="menu-info">
+            <h3>新規作品を作成</h3>
+            <p>題名を決めて新しい物語やエッセイを書き始める</p>
+          </div>
+          <span>🍃</span>
+        </div>
+        <div class="menu-card" onclick="navigateTo('edit')">
+          <div class="icon-box">✏️</div>
+          <div class="menu-info">
+            <h3>物語編集</h3>
+            <p>執筆中の作品の続きを書く・推敲する</p>
+          </div>
+          <span>🌿</span>
+        </div>
+        <div class="menu-card" onclick="navigateTo('ideas')">
+          <div class="icon-box">💡</div>
+          <div class="menu-info">
+            <h3>物語別アイディア</h3>
+            <p>プロット、伏線メモ、作品ごとのひらめき</p>
+          </div>
+          <span>🌱</span>
+        </div>
+        <div class="menu-card" onclick="navigateTo('materials')">
+          <div class="icon-box">📁</div>
+          <div class="menu-info">
+            <h3>物語別資料集</h3>
+            <p>世界観設定、登場人物、参考リンク・ノート</p>
+          </div>
+          <span>🍀</span>
+        </div>
+        <div class="menu-card" onclick="navigateTo('read')">
+          <div class="icon-box">📖</div>
+          <div class="menu-info">
+            <h3>創作物を読む（本棚）</h3>
+            <p>完成した本を選んでじっくり読書する</p>
+          </div>
+          <span>📚</span>
         </div>
       </div>
-
-      <!-- Chapter / Item List Header -->
-      <div class="flex justify-between items-center mb-3 pb-1 border-b border-emerald-200">
-        <h3 id="sidebar-category-title" class="font-bold text-xs text-accent-green font-sans flex items-center gap-1">
-          <i data-lucide="list-tree" class="w-3.5 h-3.5"></i> 目次・章一覧
-        </h3>
-        <button onclick="toggleSidebar(false)" class="md:hidden text-gray-500 hover:text-accent-green">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- Chapter List Container -->
-      <ul id="chapter-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
-        <!-- Chapters loaded dynamically -->
-      </ul>
-
-      <!-- Add New Chapter Button -->
-      <button id="add-chapter-btn" onclick="createNewChapter()" class="mt-3 w-full bg-accent-green hover:bg-accent-hover text-white py-2 px-3 rounded-xl font-sans text-xs md:text-sm flex items-center justify-center space-x-1 shadow transition-all">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-        <span>項目・章を追加</span>
-      </button>
-    </aside>
-
-    <!-- Right Area: Paper / Editor Container -->
-    <main class="flex-1 bg-[#eae5d8] p-3 md:p-8 overflow-y-auto flex justify-center items-start">
-      <div id="paper-element" class="paper-texture w-full max-w-3xl min-h-[calc(100vh-100px)] border border-paper-border rounded-lg shadow-md p-6 md:p-12 flex flex-col transition-all duration-300">
-        
-        <!-- Document Title Input -->
-        <input type="text" id="document-title" 
-          class="paper-title text-xl md:text-2xl font-bold bg-transparent border-b border-dashed border-amber-300/80 outline-none pb-2 mb-6 text-ink-dark placeholder-amber-700/40" 
-          placeholder="タイトルを入力..." oninput="autoSaveCurrentChapter()">
-
-        <!-- Document Content Textarea -->
-        <textarea id="document-content" 
-          class="paper-textarea flex-1 w-full bg-transparent border-none outline-none resize-none text-base md:text-lg leading-relaxed md:leading-loose text-ink-dark placeholder-amber-700/30" 
-          placeholder="ここに文章やアイデアを書いていきます..." oninput="handleContentInput()"></textarea>
-
-      </div>
-    </main>
-
-  </div>
-
-  <!-- Smartphone PWA Installation Guide Modal -->
-  <div id="install-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-card-bg rounded-2xl max-w-md w-full p-6 shadow-xl relative font-sans">
-      <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="p-2.5 bg-emerald-100 text-accent-green rounded-xl">
-          <i data-lucide="smartphone" class="w-6 h-6"></i>
-        </div>
-        <h3 class="text-lg font-bold text-gray-800">スマホアプリとして追加</h3>
-      </div>
-
-      <p class="text-xs text-gray-600 mb-4 leading-relaxed">
-        このアプリはホーム画面に追加することで、オフラインでも本物のアプリアイコンからすばやく起動できます。
-      </p>
-
-      <div class="space-y-4 text-xs">
-        <!-- iOS Guide -->
-        <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100">
-          <h4 class="font-bold text-accent-green flex items-center gap-1 mb-1">
-            <i data-lucide="apple" class="w-4 h-4"></i> iPhone (Safari) の場合
-          </h4>
-          <ol class="list-decimal list-inside text-gray-700 space-y-1 pl-1">
-            <li>画面下の共有ボタン（<i data-lucide="share" class="w-3 h-3 inline"></i>）をタップ</li>
-            <li>メニューから「<strong>ホーム画面に追加</strong>」を選択</li>
-            <li>右上の「追加」をタップして完了</li>
-          </ol>
-        </div>
-
-        <!-- Android Guide -->
-        <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100">
-          <h4 class="font-bold text-accent-green flex items-center gap-1 mb-1">
-            <i data-lucide="smartphone" class="w-4 h-4"></i> Android (Chrome) の場合
-          </h4>
-          <ol class="list-decimal list-inside text-gray-700 space-y-1 pl-1">
-            <li>右上メニューボタン（縦の3点リーダー）をタップ</li>
-            <li>「<strong>アプリをインストール</strong>」または「<strong>ホーム画面に追加</strong>」を選択</li>
-          </ol>
-        </div>
-      </div>
-
-      <button onclick="closeInstallModal()" class="mt-6 w-full bg-accent-green text-white py-2.5 rounded-xl font-bold text-xs hover:bg-accent-hover transition-colors">
-        閉じる
-      </button>
     </div>
+
+    <!-- 編集画面 -->
+    <div id="page-edit" class="page">
+      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
+      <h2>物語編集</h2>
+      <div id="edit-book-list" class="item-list"></div>
+      <div id="editor-area" style="display:none; margin-top:20px;">
+        <h3 id="current-book-title"></h3>
+        <textarea id="editor-content" rows="15" placeholder="ここに本文を書き進めましょう..."></textarea>
+        <button class="btn" onclick="saveCurrentBook()">保存する</button>
+      </div>
+    </div>
+
+    <!-- アイディア画面 -->
+    <div id="page-ideas" class="page">
+      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
+      <h2>物語別アイディア</h2>
+      <div id="ideas-list" class="item-list"></div>
+    </div>
+
+    <!-- 資料集画面 -->
+    <div id="page-materials" class="page">
+      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
+      <h2>物語別資料集</h2>
+      <div id="materials-list" class="item-list"></div>
+    </div>
+
+    <!-- 読書画面 -->
+    <div id="page-read" class="page">
+      <button class="back-btn" onclick="history.back()">← ホームへ戻る</button>
+      <h2>本棚（読書）</h2>
+      <div id="read-list" class="item-list"></div>
+    </div>
+
   </div>
 
-  <!-- Create New Group Modal -->
-  <div id="new-group-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-card-bg rounded-2xl max-w-sm w-full p-6 shadow-xl relative font-sans">
-      <button onclick="closeNewGroupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <i data-lucide="book-plus" class="w-5 h-5 text-accent-green"></i> 新しい本（群）を作成
-      </h3>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">作品タイトル・群の名称</label>
-          <input type="text" id="new-group-name" placeholder="例: 日常エッセイ、戦記ファンタジー" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-accent-green">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">ジャンル・説明</label>
-          <input type="text" id="new-group-desc" placeholder="例: 日常の気付きをまとめた随筆" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-accent-green">
-        </div>
-      </div>
-
-      <div class="mt-6 flex space-x-2">
-        <button onclick="closeNewGroupModal()" class="flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl text-xs font-bold">キャンセル</button>
-        <button onclick="confirmCreateNewGroup()" class="flex-1 bg-accent-green text-white py-2 rounded-xl text-xs font-bold hover:bg-accent-hover">作成する</button>
-      </div>
+  <!-- 新規作成ダイアログ -->
+  <div id="new-book-modal" class="modal">
+    <div class="modal-content">
+      <h3>新しい作品の題名</h3>
+      <p style="font-size:0.85rem; color:#666; margin-top:4px;">物語やエッセイのタイトルを入力してください</p>
+      <input type="text" id="new-book-title" placeholder="作品のタイトル...">
+      <button class="btn" onclick="createNewBook()">作成して執筆をはじめる</button>
+      <button class="back-btn" style="width:100%; text-align:center; margin-top:8px;" onclick="closeNewBookModal()">キャンセル</button>
     </div>
   </div>
 
   <script>
-    /* Application State */
-    let currentCategory = ''; // 新規作成, 物語編集, 物語別アイディア, 物語別資料集, 創作物を読む
-    let activeGroupId = null;
-    let activeChapterId = null;
-    let isVertical = false;
+    // データ管理（localStorage）
+    let books = JSON.parse(localStorage.getItem('my_novels') || '[]');
+    let currentBookIndex = null;
 
-    // Initial Default Data (Groups & Chapters)
-    const DEFAULT_STORAGE_KEY = 'novel_app_data_v2';
+    // 画面遷移・履歴管理（端末の「戻る」ボタン連携）
+    function navigateTo(pageId, isBack = false) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById('page-' + pageId);
+      if (targetPage) targetPage.classList.add('active');
 
-    function getInitialData() {
-      return {
-        groups: [
-          {
-            id: 'war-fantasy',
-            title: '戦記ファンタジー物語',
-            desc: '剣と魔法の大陸で繰り広げられる戦乱の記',
-            coverColor: 'bg-emerald-800',
-            chapters: [
-              { id: 101, title: 'プロローグ: 嵐の前触れ', content: '北方の国境沿いに、鈍い鉄の臭いが立ち込めていた。' },
-              { id: 102, title: '第一章: 誓いの剣', content: '「この剣に誓って、私は民を守る」青年は言った。' }
-            ],
-            ideas: [
-              { id: 201, title: 'ラストシーンの伏線', content: '主人公の持つペンダントが鍵となる。' }
-            ],
-            research: [
-              { id: 301, title: '魔法体系の設定', content: '属性は火・水・風・土・聖・暗の6種。' }
-            ]
-          },
-          {
-            id: 'daily-essay',
-            title: '日常のエッセイ集',
-            desc: '日々のちょっとした発見や思考のログ',
-            coverColor: 'bg-amber-800',
-            chapters: [
-              { id: 401, title: '1. 雨の日のコーヒー', content: '静かに降る雨音を聴きながら淹れる珈琲は格別だ。' },
-              { id: 402, title: '2. 散歩道で見つけた葉っぱ', content: '緑から黄色へと移り変わるグラデーションが美しかった。' }
-            ],
-            ideas: [
-              { id: 501, title: '書くネタリスト', content: '・本屋のにおい\n・早朝の空気感' }
-            ],
-            research: [
-              { id: 601, title: '好きな言葉メモ', content: '「小さな努力の積み重ねが未来を創る」' }
-            ]
-          }
-        ]
-      };
-    }
-
-    /* LocalStorage Helpers */
-    function loadAppData() {
-      const stored = localStorage.getItem(DEFAULT_STORAGE_KEY);
-      if (!stored) {
-        const initial = getInitialData();
-        saveAppData(initial);
-        return initial;
+      if (!isBack) {
+        history.pushState({ page: pageId }, '', '#' + pageId);
       }
-      return JSON.parse(stored);
-    }
-
-    function saveAppData(data) {
-      localStorage.setItem(DEFAULT_STORAGE_KEY, JSON.stringify(data));
-    }
-
-    /* App Initialization */
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      registerServiceWorker();
-
-      const data = loadAppData();
-      if (data.groups.length > 0) {
-        activeGroupId = data.groups[0].id;
-      }
-    });
-
-    /* Navigation & Views Switcher */
-    function openWorkspace(category) {
-      currentCategory = category;
       
-      document.getElementById('menu-view').classList.add('hidden');
-      document.getElementById('bookshelf-view').classList.add('hidden');
-      document.getElementById('workspace-view').classList.remove('hidden');
-      document.getElementById('back-btn').classList.remove('hidden');
-      document.getElementById('editor-tools').classList.remove('hidden');
-      document.getElementById('mobile-sidebar-toggle').classList.remove('hidden');
-
-      document.getElementById('header-title').innerText = category;
-      document.getElementById('sidebar-category-title').innerText = `${category}（項目）`;
-
-      // Read-only check for reading mode
-      const isReadOnly = (category === '創作物を読む');
-      document.getElementById('document-title').readOnly = isReadOnly;
-      document.getElementById('document-content').readOnly = isReadOnly;
-
-      populateGroupSelect();
-      loadSidebarChapters();
-      toggleSidebar(false);
+      if (pageId === 'edit') renderEditList();
+      if (pageId === 'ideas') renderIdeas();
+      if (pageId === 'materials') renderMaterials();
+      if (pageId === 'read') renderReadList();
     }
 
-    function openBookshelf() {
-      currentCategory = '創作物を読む';
-      document.getElementById('menu-view').classList.add('hidden');
-      document.getElementById('workspace-view').classList.add('hidden');
-      document.getElementById('bookshelf-view').classList.remove('hidden');
-      document.getElementById('back-btn').classList.remove('hidden');
-      document.getElementById('editor-tools').classList.add('hidden');
-      document.getElementById('mobile-sidebar-toggle').classList.add('hidden');
-
-      document.getElementById('header-title').innerText = '📖 創作物を読む（本棚）';
-
-      renderBookshelf();
-    }
-
-    function showMenu() {
-      document.getElementById('menu-view').classList.remove('hidden');
-      document.getElementById('workspace-view').classList.add('hidden');
-      document.getElementById('bookshelf-view').classList.add('hidden');
-      document.getElementById('back-btn').classList.add('hidden');
-      document.getElementById('editor-tools').classList.add('hidden');
-      document.getElementById('mobile-sidebar-toggle').classList.add('hidden');
-
-      document.getElementById('header-title').innerText = 'マイ創作ノート';
-    }
-
-    /* Group (本・群) Logic */
-    function populateGroupSelect() {
-      const data = loadAppData();
-      const select = document.getElementById('work-group-select');
-      select.innerHTML = '';
-
-      data.groups.forEach(group => {
-        const option = document.createElement('option');
-        option.value = group.id;
-        option.textContent = group.title;
-        if (group.id === activeGroupId) option.selected = true;
-        select.appendChild(option);
-      });
-    }
-
-    function changeActiveGroup(groupId) {
-      activeGroupId = groupId;
-      activeChapterId = null; // reset selected chapter
-      loadSidebarChapters();
-    }
-
-    function renderBookshelf() {
-      const data = loadAppData();
-      const grid = document.getElementById('bookshelf-grid');
-      grid.innerHTML = '';
-
-      data.groups.forEach(group => {
-        const bookCount = (group.chapters || []).length;
-        const totalChars = (group.chapters || []).reduce((sum, ch) => sum + (ch.content ? ch.content.length : 0), 0);
-
-        const card = document.createElement('div');
-        card.className = "book-card cursor-pointer bg-card-bg border border-emerald-100 rounded-2xl p-4 shadow-sm hover:shadow-md flex flex-col justify-between";
-        card.onclick = () => {
-          activeGroupId = group.id;
-          openWorkspace('創作物を読む');
-        };
-
-        card.innerHTML = `
-          <div>
-            <div class="h-28 w-full ${group.coverColor || 'bg-emerald-800'} rounded-xl p-3 text-white flex flex-col justify-between shadow-inner mb-3">
-              <span class="text-[10px] opacity-80 font-sans tracking-widest">VOLUME</span>
-              <h4 class="font-bold text-sm leading-snug line-clamp-2">${escapeHtml(group.title)}</h4>
-            </div>
-            <p class="text-xs text-gray-600 line-clamp-2 font-sans mb-2">${escapeHtml(group.desc || '説明なし')}</p>
-          </div>
-
-          <div class="pt-2 border-t border-gray-100 flex justify-between items-center text-[11px] text-gray-500 font-sans">
-            <span>${bookCount} 話</span>
-            <span>約 ${totalChars.toLocaleString()} 字</span>
-          </div>
-        `;
-
-        grid.appendChild(card);
-      });
-    }
-
-    /* Chapter / Item Logic */
-    function getItemKeyForCategory() {
-      if (currentCategory === '物語別アイディア') return 'ideas';
-      if (currentCategory === '物語別資料集') return 'research';
-      return 'chapters'; // 新規作成, 物語編集, 創作物を読む
-    }
-
-    function loadSidebarChapters() {
-      const data = loadAppData();
-      const group = data.groups.find(g => g.id === activeGroupId) || data.groups[0];
-      if (!group) return;
-
-      activeGroupId = group.id;
-      const key = getItemKeyForCategory();
-      const items = group[key] || [];
-
-      const listEl = document.getElementById('chapter-list');
-      listEl.innerHTML = '';
-
-      if (items.length === 0) {
-        // Auto create first item if empty
-        createNewChapter();
-        return;
-      }
-
-      items.forEach(item => {
-        const isActive = item.id === (activeChapterId || items[0].id);
-        const li = document.createElement('li');
-
-        li.className = `p-3 rounded-xl cursor-pointer font-sans text-xs md:text-sm flex items-center justify-between transition-all ${
-          isActive 
-            ? 'bg-card-bg font-bold text-accent-green shadow-sm border-l-4 border-accent-green' 
-            : 'hover:bg-emerald-100/50 text-gray-700'
-        }`;
-
-        li.innerHTML = `
-          <span class="truncate flex-1 pr-2">${escapeHtml(item.title || '無題の項目')}</span>
-          ${currentCategory !== '創作物を読む' ? `
-            <button onclick="deleteChapter(event, ${item.id})" class="text-gray-400 hover:text-red-500 p-1 opacity-60 hover:opacity-100">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          ` : ''}
-        `;
-
-        li.onclick = (e) => {
-          if (e.target.closest('button')) return;
-          activeChapterId = item.id;
-          loadSidebarChapters();
-          toggleSidebar(false);
-        };
-
-        listEl.appendChild(li);
-      });
-
-      if (!activeChapterId || !items.find(i => i.id === activeChapterId)) {
-        activeChapterId = items[0].id;
-      }
-
-      displayCurrentChapterContent();
-      lucide.createIcons();
-    }
-
-    function displayCurrentChapterContent() {
-      const data = loadAppData();
-      const group = data.groups.find(g => g.id === activeGroupId);
-      if (!group) return;
-
-      const key = getItemKeyForCategory();
-      const item = (group[key] || []).find(i => i.id === activeChapterId);
-
-      if (item) {
-        document.getElementById('document-title').value = item.title || '';
-        document.getElementById('document-content').value = item.content || '';
-        updateCharacterCount();
-      }
-    }
-
-    function createNewChapter() {
-      const data = loadAppData();
-      const group = data.groups.find(g => g.id === activeGroupId);
-      if (!group) return;
-
-      const key = getItemKeyForCategory();
-      if (!group[key]) group[key] = [];
-
-      const newId = Date.now();
-      const newChapter = {
-        id: newId,
-        title: `新しい ${key === 'ideas' ? 'アイディア' : key === 'research' ? '資料' : '章'} (${group[key].length + 1})`,
-        content: ''
-      };
-
-      group[key].push(newChapter);
-      saveAppData(data);
-      activeChapterId = newId;
-      loadSidebarChapters();
-    }
-
-    function deleteChapter(e, id) {
-      e.stopPropagation();
-      const data = loadAppData();
-      const group = data.groups.find(g => g.id === activeGroupId);
-      if (!group) return;
-
-      const key = getItemKeyForCategory();
-      if (group[key].length <= 1) {
-        alert('最低1つの項目が必要です。');
-        return;
-      }
-
-      if (confirm('この項目を削除しますか？')) {
-        group[key] = group[key].filter(i => i.id !== id);
-        saveAppData(data);
-        if (activeChapterId === id) {
-          activeChapterId = group[key][0].id;
-        }
-        loadSidebarChapters();
-      }
-    }
-
-    function autoSaveCurrentChapter() {
-      if (!activeGroupId || !activeChapterId) return;
-
-      const data = loadAppData();
-      const group = data.groups.find(g => g.id === activeGroupId);
-      if (!group) return;
-
-      const key = getItemKeyForCategory();
-      const item = (group[key] || []).find(i => i.id === activeChapterId);
-
-      if (item) {
-        item.title = document.getElementById('document-title').value;
-        item.content = document.getElementById('document-content').value;
-        saveAppData(data);
-
-        // Update active sidebar text
-        const activeItem = document.querySelector('#chapter-list .border-l-4 span');
-        if (activeItem) {
-          activeItem.textContent = item.title || '無題の項目';
-        }
-      }
-    }
-
-    function handleContentInput() {
-      updateCharacterCount();
-      autoSaveCurrentChapter();
-    }
-
-    /* Writing / Reading Tools */
-    function toggleWritingMode() {
-      isVertical = !isVertical;
-      const paper = document.getElementById('paper-element');
-      const modeText = document.getElementById('mode-text');
-      const modeIcon = document.getElementById('mode-icon');
-
-      if (isVertical) {
-        paper.classList.add('vertical-mode');
-        modeText.innerText = '横書きに切替';
-        modeIcon.setAttribute('data-lucide', 'align-justify');
+    // ブラウザ・端末の「戻る」ボタンが押された時の処理
+    window.onpopstate = function(event) {
+      if (event.state && event.state.page) {
+        navigateTo(event.state.page, true);
       } else {
-        paper.classList.remove('vertical-mode');
-        modeText.innerText = '縦書きに切替';
-        modeIcon.setAttribute('data-lucide', 'align-left');
+        navigateTo('home', true);
       }
-      lucide.createIcons();
+    };
+
+    // 初期化（URLハッシュチェック）
+    window.onload = function() {
+      history.replaceState({ page: 'home' }, '', '#home');
+    };
+
+    // 新規作成ダイアログ
+    function openNewBookModal() {
+      document.getElementById('new-book-modal').classList.add('active');
+      document.getElementById('new-book-title').focus();
+    }
+    function closeNewBookModal() {
+      document.getElementById('new-book-modal').classList.remove('active');
+      document.getElementById('new-book-title').value = '';
     }
 
-    function updateCharacterCount() {
-      const text = document.getElementById('document-content').value || '';
-      const cleanText = text.replace(/\r?\n/g, '');
-      document.getElementById('char-count').innerText = cleanText.length.toLocaleString();
-    }
-
-    function toggleSidebar(forceState) {
-      const sidebar = document.getElementById('sidebar');
-      const backdrop = document.getElementById('sidebar-backdrop');
+    // 作品の新規作成
+    function createNewBook() {
+      const title = document.getElementById('new-book-title').value.trim();
+      if (!title) {
+        alert('タイトルを入力してください');
+        return;
+      }
+      const newBook = { title: title, content: '', created: new Date().toLocaleDateString() };
+      books.push(newBook);
+      localStorage.setItem('my_novels', JSON.stringify(books));
       
-      const isCurrentlyOpen = !sidebar.classList.contains('-translate-x-full');
-      const nextState = (forceState !== undefined) ? forceState : !isCurrentlyOpen;
-
-      if (nextState) {
-        sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('hidden');
-      }
+      closeNewBookModal();
+      navigateTo('edit');
+      openEditor(books.length - 1);
     }
 
-    /* New Group Modal Handlers */
-    function createNewGroupModal() {
-      document.getElementById('new-group-modal').classList.remove('hidden');
-    }
-    function closeNewGroupModal() {
-      document.getElementById('new-group-modal').classList.add('hidden');
-    }
-    function confirmCreateNewGroup() {
-      const name = document.getElementById('new-group-name').value.trim();
-      const desc = document.getElementById('new-group-desc').value.trim();
-
-      if (!name) {
-        alert('作品タイトル（群の名前）を入力してください');
+    // 編集画面の描画
+    function renderEditList() {
+      const container = document.getElementById('edit-book-list');
+      if (books.length === 0) {
+        container.innerHTML = '<p style="color:#888;">まだ作品がありません。「新規作品を作成」から作成してください。</p>';
         return;
       }
-
-      const data = loadAppData();
-      const newGroup = {
-        id: 'group_' + Date.now(),
-        title: name,
-        desc: desc || '新しい創作群',
-        coverColor: 'bg-emerald-800',
-        chapters: [{ id: Date.now(), title: '第一章', content: '' }],
-        ideas: [],
-        research: []
-      };
-
-      data.groups.push(newGroup);
-      saveAppData(data);
-
-      document.getElementById('new-group-name').value = '';
-      document.getElementById('new-group-desc').value = '';
-      closeNewGroupModal();
-
-      if (!document.getElementById('bookshelf-view').classList.contains('hidden')) {
-        renderBookshelf();
-      } else {
-        activeGroupId = newGroup.id;
-        populateGroupSelect();
-        loadSidebarChapters();
-      }
+      container.innerHTML = books.map((b, i) => `
+        <div class="item-card" onclick="openEditor(${i})">
+          <strong>${b.title}</strong>
+          <p style="font-size:0.8rem; color:#888; margin-top:4px;">作成日: ${b.created}</p>
+        </div>
+      `).join('');
     }
 
-    /* Modals & Helpers */
-    function openInstallModal() {
-      document.getElementById('install-modal').classList.remove('hidden');
-    }
-    function closeInstallModal() {
-      document.getElementById('install-modal').classList.add('hidden');
-    }
-    function escapeHtml(str) {
-      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    function openEditor(index) {
+      currentBookIndex = index;
+      document.getElementById('edit-book-list').style.display = 'none';
+      document.getElementById('editor-area').style.display = 'block';
+      document.getElementById('current-book-title').innerText = books[index].title;
+      document.getElementById('editor-content').value = books[index].content || '';
     }
 
-    /* PWA Service Worker Registration */
-    function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        const swCode = `
-          self.addEventListener('install', (e) => self.skipWaiting());
-          self.addEventListener('activate', (e) => self.clients.claim());
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-          });
-        `;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-      }
+    function saveCurrentBook() {
+      if (currentBookIndex === null) return;
+      books[currentBookIndex].content = document.getElementById('editor-content').value;
+      localStorage.setItem('my_novels', JSON.stringify(books));
+      alert('保存しました！');
+    }
+
+    function renderIdeas() {
+      document.getElementById('ideas-list').innerHTML = books.length ? 
+        books.map(b => `<div class="item-card"><strong>${b.title} のアイディア</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">メモや伏線を記録...</p></div>`).join('') :
+        '<p style="color:#888;">作品がありません。</p>';
+    }
+
+    function renderMaterials() {
+      document.getElementById('materials-list').innerHTML = books.length ? 
+        books.map(b => `<div class="item-card"><strong>${b.title} の資料集</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">キャラクターや世界観設定...</p></div>`).join('') :
+        '<p style="color:#888;">作品がありません。</p>';
+    }
+
+    function renderReadList() {
+      document.getElementById('read-list').innerHTML = books.length ? 
+        books.map(b => `<div class="item-card"><strong>${b.title}</strong><p style="font-size:0.85rem; color:#666; margin-top:6px;">${b.content.substring(0, 40)}...</p></div>`).join('') :
+        '<p style="color:#888;">本棚は空です。</p>';
     }
   </script>
 </body>
